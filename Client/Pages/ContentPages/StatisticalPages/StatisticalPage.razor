@@ -1,0 +1,48 @@
+﻿@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Charts
+@implements IDisposable
+
+@if (allState.ShowStatistical)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card border-warning shadow-lg">
+                    <div class="card-header"><h4 class="float-start">Statistical</h4></div>
+                    <div class="card-body" style="max-height: 580px; overflow-y: scroll;">
+                        <SfButton CssClass="e-success" OnClick="PeriodicEvaluationClicked">Periodic Evaluation</SfButton>
+                        <SfButton CssClass="e-success" OnClick="EmployeeDistributionClicked">Employee Distribution</SfButton>
+                        <div class="mt-4">
+                            <PeriodicEvaluationStatistical @ref="periodicEvaluationStatistical" />
+                            <EmployeeDistributionStatistical @ref="employeeDistributionStatistical" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    PeriodicEvaluationStatistical? periodicEvaluationStatistical;
+    EmployeeDistributionStatistical? employeeDistributionStatistical;
+
+    protected async override Task OnInitializedAsync()
+    {
+        allState.Action += StateHasChanged;
+    }
+
+    private void PeriodicEvaluationClicked()
+    {
+        employeeDistributionStatistical?.CloseEmployeeDistributionStatistical();
+        periodicEvaluationStatistical?.OpenPeriodicEvaluationStatistical();
+    }
+
+    private void EmployeeDistributionClicked()
+    {
+        periodicEvaluationStatistical?.ClosePeriodicEvaluationStatistical();
+        employeeDistributionStatistical?.OpenEmployeeDistributionStatistical();
+    }
+
+    public void Dispose() => allState.Action -= StateHasChanged;
+}

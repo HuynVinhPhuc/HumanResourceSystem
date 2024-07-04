@@ -1,0 +1,201 @@
+﻿<SfDialog Width="750px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+    <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
+    <DialogTemplates>
+        <Header> List Evaluations </Header>
+        <Content>
+            <EditForm Model="Employee" Enhance>
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Id</label>
+                            <input @bind="Employee.Id" class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input @bind="Employee.Name" class="form-control" disabled />
+                        </div>
+                        <div class="form-group mt-2">
+                            <label class="form-label">List Employee</label>
+                            <div class="table-wrapper">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Technical</th>
+                                            <th scope="col">Communication</th>
+                                            <th scope="col">Teamwork</th>
+                                            <th scope="col">Problem Solving</th>
+                                            <th scope="col">Work Ethic</th>
+                                            <th scope="col">Action</th> 
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                        int count = 1;
+                                        for (int i = PeriodicEvaluations.Count - 1; i >= 0; i--)
+                                        {
+                                        var item = PeriodicEvaluations[i];
+                                        <tr>
+                                            <th scope="row">@count</th>
+                                            <td>@item.EvaluationDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.TechnicalSkillsScore</td>
+                                            <td>@item.CommunicationSkillsScore</td>
+                                            <td>@item.TeamworkSkillsScore</td>
+                                            <td>@item.ProblemSolvingSkillsScore</td>
+                                            <td>@item.WorkEthicScore</td>
+                                            <td>
+                                                @if (DateTime.Now.Day >= 1 && DateTime.Now.Day <= 5 && item.EvaluationDate.Month == DateTime.Now.Month)
+                                                {
+                                                    <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="() => EditClicked(item)"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-eye text-info" id="cursorStyle" @onclick="() => ShowClicked(item)"></i>
+                                                }
+                                            </td>
+                                        </tr>
+                                        count++;
+                                        }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        @{
+        var currentDate = DateTime.Now;
+        bool showButtons = false;
+        if (PeriodicEvaluations.Count > 0)
+        {
+            var lastItem = PeriodicEvaluations[PeriodicEvaluations.Count - 1];
+
+            if (currentDate.Day >= 1 && currentDate.Day <= 5 &&
+            lastItem.EvaluationDate.Month != currentDate.Month)
+            {
+                showButtons = true;
+            }
+        }
+        }
+        @if (showButtons)
+        {
+            <DialogButton Content="ADD" IsPrimary="true" OnClick="Add" />
+        }
+        <DialogButton Content="CLOSE" IsPrimary="true" OnClick="Close" />
+    </DialogButtons>
+</SfDialog>
+
+<style>
+    .table-wrapper {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .table thead {
+        position: sticky;
+        top: 0;
+        background-color: white; /* Màu nền của thead để tránh che khuất nội dung khi cuộn */
+        z-index: 1; /* Đảm bảo thead luôn ở trên các dòng tbody */
+    }
+
+    .table thead th {
+        background-color: white; /* Màu nền của các tiêu đề cột */
+    }
+</style>
+
+<AddOrUpdatePeriodicEvaluationDialog @ref="addOrUpdatePeriodicEvaluationDialog"
+                                     PeriodicEvaluation="PeriodicEvaluation"
+                                     HandleSavePeriodicEvaluationEvent="HandleSavePeriodicEvaluationEvent" />
+
+@code {
+    [Parameter] public Employee Employee { get; set; } = new();
+    [Parameter] public List<PeriodicEvaluation> PeriodicEvaluations { get; set; } = new();
+
+    AddOrUpdatePeriodicEvaluationDialog? addOrUpdatePeriodicEvaluationDialog;
+
+    public PeriodicEvaluation PeriodicEvaluation { get; set; } = new();
+
+    // Convert Candidates Into Employees
+    private async Task HandleSavePeriodicEvaluationEvent(PeriodicEvaluation item)
+    {
+        bool successCheck = false;
+        if (item.Id > 0)
+        {
+            var result = await periodicEvaluationService.Update(item, Constants.PeriodicEvaluationBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        else
+        {
+            item.EmployeeId = Employee.Id;
+            item.Name = "Periodic Evaluation";
+            var result = await periodicEvaluationService.Insert(item, Constants.PeriodicEvaluationBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        if (successCheck)
+        {
+            item.Employee = Employee;
+            PeriodicEvaluations = await periodicEvaluationService.GetAllByEmployeeId(Employee.Id, Constants.PeriodicEvaluationBaseUrl);
+            await periodicEvaluationService.SendEmail(addOrUpdatePeriodicEvaluationDialog.Title, item, Constants.PeriodicEvaluationBaseUrl);
+            StateHasChanged();
+            addOrUpdatePeriodicEvaluationDialog?.CloseDialog();
+            addOrUpdatePeriodicEvaluationDialog?.ChangeTitle("Add");
+        }
+    }
+
+    private bool IsVisible { get; set; } = false;
+
+    private void Add()
+    {
+        PeriodicEvaluation = new();
+        addOrUpdatePeriodicEvaluationDialog?.ChangeTitle("Add");
+        addOrUpdatePeriodicEvaluationDialog?.OpenDialog();
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    public void OpenDialog()
+    {        
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private void EditClicked(PeriodicEvaluation item)
+    {
+        PeriodicEvaluation = item;
+        addOrUpdatePeriodicEvaluationDialog?.ChangeTitle("Update");
+        addOrUpdatePeriodicEvaluationDialog?.OpenDialog();
+        StateHasChanged();
+    }
+
+    private void ShowClicked(PeriodicEvaluation item)
+    {
+        PeriodicEvaluation = item;
+        addOrUpdatePeriodicEvaluationDialog?.ChangeTitle("Show");
+        addOrUpdatePeriodicEvaluationDialog?.OpenDialog();
+        StateHasChanged();
+    }
+
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (flag)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Alert!");
+            return false;
+        }
+    }
+}

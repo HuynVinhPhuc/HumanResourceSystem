@@ -1,0 +1,313 @@
+﻿@attribute [Authorize]
+
+<CascadingAuthenticationState>
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/home/dashboard">
+            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+        </a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link p-2" @onclick="ShowAdminMenuContainer" style="cursor:pointer" href="javascript:void()">
+                        <div class="hstack gap-1">
+                            <span class="bi bi-person-fill fs-3 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                            <span>Administration</span>
+                        </div>
+                    </NavLink>
+                    <span class="nav-link p-2 text-white" style="margin-left:1rem; visibility:@CssStyle">
+                        <ul class="list-group">
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="UserClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-person fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>User</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <hr />
+                            </li>
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="RecruitmentClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-briefcase fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Recruitment</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="CandidateClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-file-earmark-person fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Candidate</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <hr />
+                            </li>
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="TrainingProgramClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-mortarboard fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Training Program</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="InstructorClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-person-workspace fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Instructor</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <hr />
+                            </li>
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="PeriodicEvaluationClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-journal-text fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Evaluation</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <hr />
+                            </li>
+                            <li style="list-style:none" class="cusorStyle">
+                                <a class="nav-link p-2" @onclick="StatisticalClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-graph-up fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Statistical</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>                        
+                    </span>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+        <div class="nav-item px-3" style="margin-top:@DepartmentMargin">
+            <NavLink class="nav-link p-2" @onclick="ShowDepartmentContainer" style="cursor:pointer" href="javascript:void()">
+                <div class="hstack gap-1">
+                    <span class="bi bi-backpack4-fill fs-3 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                    <span>Management</span>
+                </div>
+            </NavLink>
+            <span class="nav-link p-2 text-white" style="margin-left:1rem; visibility:@DepartmentCssStyle">
+                <ul class="list-group">
+                    <!-- Các mục trong menu Management -->
+                    <li style="list-style:none" class="cusorStyle">
+                        <a class="nav-link p-2" @onclick="GeneralDepartmentClicked">
+                            <div class="hstack text-wrap">
+                                <span class="bi bi-file-medical fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>General Dep</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none" class="cusorStyle" @onclick="DepartmentClicked">
+                        <a class="nav-link p-2">
+                            <div class="hstack">
+                                <span class="bi bi-substack fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Department</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none" class="cusorStyle" @onclick="BranchClicked">
+                        <a class="nav-link p-2">
+                            <div class="hstack">
+                                <span class="bi bi-chevron-bar-contract fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Branch</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <hr />
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="CountryClicked">
+                            <div class="hstack">
+                                <span class="bi bi-geo-alt fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Country</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="CityClicked">
+                            <div class="hstack">
+                                <span class="bi bi-pin-map-fill fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>City</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="TownClicked">
+                            <div class="hstack">
+                                <span class="bi bi-geo fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Town</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <hr />
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="OvertimeTypeClicked">
+                            <div class="hstack">
+                                <span class="bi bi-stopwatch fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Overtime Type</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="SanctionTypeClicked">
+                            <div class="hstack">
+                                <span class="bi bi-x-octagon fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Sanction Type</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="VacationTypeClicked">
+                            <div class="hstack">
+                                <span class="bi bi-backpack3 fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Vacation Type</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li style="list-style:none">
+                        <hr />
+                    </li>
+                    <li style="list-style:none">
+                        <a class="nav-link p-2 cusorStyle" @onclick="EmployeeClicked">
+                            <div class="hstack">
+                                <span class="bi bi-people-fill fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                <span>Employee</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </span>
+        </div>
+    </nav>
+</div>
+</CascadingAuthenticationState>
+
+<style>
+    .cursorStyle {
+        cursor: pointer
+    }
+</style>
+
+@code {
+    private bool collapseNavMenu = false;  /* private bool collapseNavMenu = true; */
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = collapseNavMenu; /* collapseNavMenu = !collapseNavMenu; */
+    }
+
+    public string DepartmentMargin { get; set; } = "-30.5rem";
+    private string CssStyle = "hidden";
+    public bool ShowHide { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.IsInRole("User"))
+        {
+            DepartmentMargin = "0rem";
+        }
+    }
+
+    private void ShowAdminMenuContainer()
+    {
+        ShowHide = !ShowHide;
+        if (ShowHide)
+        {
+            DepartmentMargin = "-0.5rem";
+            CssStyle = "visible";
+        }
+        else
+        {
+            DepartmentMargin = "-30.5rem";
+            CssStyle = "hidden";
+        }
+    }
+
+    private string DepartmentCssStyle = "hidden";
+    public bool ShowHideDepartment { get; set; } = false;
+
+    private void ShowDepartmentContainer()
+    {
+        ShowHideDepartment = !ShowHideDepartment;
+        if (ShowHideDepartment)
+        {
+            DepartmentCssStyle = "visible";
+        }
+        else
+        {
+            DepartmentCssStyle = "hidden";
+        }
+    }
+
+    // General Departments / Department / Branch
+    void GeneralDepartmentClicked() => allState.GeneralDepartmentClicked();
+
+    void DepartmentClicked() => allState.DepartmentClicked();
+
+    void BranchClicked() => allState.BranchClicked();
+
+    // Country / City / Town
+    void CountryClicked() => allState.CountryClicked();
+
+    void CityClicked() => allState.CityClicked();
+
+    void TownClicked() => allState.TownClicked();
+
+    // VacationType / OvertimeType / SanctionType
+    void VacationTypeClicked() => allState.VacationTypeClicked();
+
+    void OvertimeTypeClicked() => allState.OvertimeTypeClicked();
+
+    void SanctionTypeClicked() => allState.SanctionTypeClicked();
+
+    // User
+    void UserClicked() => allState.UserClicked();
+
+    // Employee
+    void EmployeeClicked() => allState.EmployeeClicked();
+
+    // Recruitment / Candidate
+    void RecruitmentClicked() => allState.RecruitmentClicked();
+
+    // Candidate
+    void CandidateClicked() => allState.CandidateClicked();
+
+    // Training Program / Instructor
+    void TrainingProgramClicked() => allState.TrainingProgramClicked();
+    void InstructorClicked() => allState.InstructorClicked();
+
+    // Periodic Evaluation
+    void PeriodicEvaluationClicked() => allState.PeriodicEvaluationClicked();
+
+    // Statistical
+    void StatisticalClicked() => allState.StatisticalClicked();
+}

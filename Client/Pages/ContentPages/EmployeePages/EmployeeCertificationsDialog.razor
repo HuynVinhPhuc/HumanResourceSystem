@@ -1,0 +1,91 @@
+﻿<SfDialog Width="500px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+    <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
+    <DialogTemplates>
+        <Header> Employee Certifications </Header>
+        <Content>
+            <EditForm Model="EmployeeDetails" Enhance>
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Id</label>
+                            <input @bind="EmployeeDetails.Id" class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input @bind="EmployeeDetails.Name" class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">List Certifications</label>
+                            <div class="table-wrapper">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int count = 1;
+                                            foreach (var item in SelectedParticipants)
+                                            {
+                                                if (item.TrainingProgram.EndDate < DateTime.Now)
+                                                {
+                                                    <tr>
+                                                        <th scope="row">@count</th>
+                                                        <td>@item.TrainingProgram!.Certificate</td>
+                                                    </tr>
+                                                    count++;
+                                                }                                                
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="Close" IsPrimary="true" OnClick="CloseDialog" />
+    </DialogButtons>
+</SfDialog>
+
+<style>
+    .table-wrapper {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .table thead {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
+    }
+
+    .table thead th {
+        background-color: white;
+    }
+</style>
+
+@code {
+    [Parameter] public Employee EmployeeDetails { get; set; } = new();
+    [Parameter] public List<Participant> Participants { get; set; } = new();
+
+    private bool IsVisible { get; set; } = false;
+
+    public List<Participant> SelectedParticipants { get; set; } = new();
+
+    public async void OpenDialog()
+    {
+        SelectedParticipants = new();
+        IsVisible = true;
+        SelectedParticipants = Participants.Where(t => t.EmployeeId == EmployeeDetails.Id).ToList();
+        StateHasChanged();
+    }
+
+    public async void CloseDialog() => IsVisible = false;
+}

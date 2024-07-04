@@ -1,0 +1,205 @@
+﻿<SfDialog Width="350px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+    <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
+    <DialogTemplates>
+        <Header> @Title Training Program </Header>
+        <Content>
+            <EditForm Model="TrainingProgram" Enhance OnSubmit="Save">
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Id</label>
+                            <input @bind="TrainingProgram.Id" class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <InputText @bind-Value="TrainingProgram.Name" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <InputTextArea @bind-Value="TrainingProgram.Description" class="form-control" />
+                        </div>
+                        <div class="form-group mt-1">
+                            <label class="form-label">Start Date</label>
+                            <InputDate @bind-Value="TrainingProgram.StartDate" @onchange="OnStartDateChanged" class="form-control" />
+                        </div>
+                        <div class="form-group mt-1">
+                            <label class="form-label">End Date</label>
+                            <InputDate @bind-Value="TrainingProgram.EndDate" class="form-control" />
+                        </div>                        
+                        <div class="form-group mt-1">
+                            <label class="form-label">Training Day</label>
+                            @if (TrainingProgram.TrainingDay != null)
+                            {
+                                DayOfWeek selected = TrainingProgram.TrainingDay;
+                                <SfDropDownList TValue="DayOfWeek" TItem="DayOfWeekItem" Placeholder="@selected.ToString()" DataSource="LocalData">
+                                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="DayOfWeek" TItem="DayOfWeekItem" ValueChange="OnTrainingDayChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            }
+                            else
+                            {
+                                <SfDropDownList TValue="DayOfWeek" TItem="DayOfWeekItem" Placeholder="Selected Training Day" DataSource="LocalData">
+                                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="DayOfWeek" TItem="DayOfWeekItem" ValueChange="OnTrainingDayChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Certificate</label>
+                            <InputText @bind-Value="TrainingProgram.Certificate" class="form-control" />
+                        </div>
+                        <div class="form-group mt-1">
+                            <label class="form-label">Instructor</label>
+                            @if (TrainingProgram.Instructor != null)
+                            {
+                                string selected = TrainingProgram.Instructor.Name;
+                                <SfDropDownList TValue="string" TItem="Instructor" Placeholder="@selected" DataSource="Instructors">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="Instructor" ValueChange="OnInstructorChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            }
+                            else
+                            {
+                                <SfDropDownList TValue="string" TItem="Instructor" Placeholder="Selected Instructor" DataSource="Instructors">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="Instructor" ValueChange="OnInstructorChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        @if (Title == "Update" && TrainingProgram.EndDate > DateTime.Now && !IsChangeStartDate)
+        {
+            <DialogButton Content="Add Employee" OnClick="AddEmployeeIntoTPButtonClicked" />
+        }
+        @if (Title == "Update" && TrainingProgram.EndDate <= DateTime.Now && !IsChangeStartDate)
+        {
+            <DialogButton Content="Show Employee" OnClick="ShowEmployeeInTPButtonClicked" />
+        }
+        <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" OnClick="Save" />
+    </DialogButtons>
+</SfDialog>
+
+<AddEmployeeIntoTrainingProgramDialog @ref="addEmployeeInToTrainingProgramDialog"
+                                      TrainingProgram="TrainingProgram"
+                                      Participants="Participants"
+                                      HandleSaveAEITP="HandleSaveAEITP" />
+
+@code {
+    [Parameter] public TrainingProgram TrainingProgram { get; set; } = new();
+    [Parameter] public List<Instructor> Instructors { get; set; } = new();
+    [Parameter] public EventCallback<TrainingProgram> HandleSaveOperationEvent { get; set; }
+
+    public List<Participant> Participants { get; set; } = new();
+
+    AddEmployeeIntoTrainingProgramDialog? addEmployeeInToTrainingProgramDialog;
+
+    public bool IsChangeStartDate = false;
+
+    public class DayOfWeekItem
+    {
+        public DayOfWeek Value { get; set; }
+        public string Text { get; set; }
+    }
+
+    List<DayOfWeekItem> LocalData = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>()
+                        .Select(d => new DayOfWeekItem { Value = d, Text = d.ToString() })
+                        .ToList();
+
+    private bool IsVisible { get; set; } = false;
+    public string Title { get; set; } = "Add";
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadParticipants();
+    }
+
+    private async Task LoadParticipants()
+    {
+        Participants = await participantService.GetAll(Constants.ParticipantBaseUrl);
+    }
+
+    private async void Save()
+    {
+        if (string.IsNullOrEmpty(TrainingProgram.Name) || TrainingProgram.InstructorId <= 0)
+            await dialogService.AlertAsync("You need to provide Training Program name.", "Alert!");
+        else
+            await HandleSaveOperationEvent.InvokeAsync(TrainingProgram);
+    }
+
+    // Test
+    private async Task HandleSaveAEITP(List<int> AddedEmployees)
+    {
+        bool successCheck = false;
+        string message = "";
+        foreach (int employee in AddedEmployees)
+        {
+            var addedEmployee = new Participant();
+            addedEmployee.TrainingProgramId = TrainingProgram.Id;
+            addedEmployee.EmployeeId = employee;
+            var result = await participantService.Insert(addedEmployee, Constants.ParticipantBaseUrl);
+            successCheck = result.Flag;
+            message = result.Message;
+        }
+        if (successCheck)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+        }
+    }
+
+    void AddEmployeeIntoTPButtonClicked()
+    {
+        addEmployeeInToTrainingProgramDialog?.ChangeTypeDialog(true);
+        addEmployeeInToTrainingProgramDialog?.OpenDialog();
+    }
+
+    void ShowEmployeeInTPButtonClicked()
+    {
+        addEmployeeInToTrainingProgramDialog?.ChangeTypeDialog(false);
+        addEmployeeInToTrainingProgramDialog?.OpenDialog();
+    }
+
+    public void OpenDialog()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (flag)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Alert!");
+            return false;
+        }
+    }
+
+    private void OnStartDateChanged(ChangeEventArgs e)
+    {
+        IsChangeStartDate = true;
+    }
+
+    public void OnTrainingDayChange(ChangeEventArgs<DayOfWeek, DayOfWeekItem> args)
+    {
+        TrainingProgram.TrainingDay = args.Value;
+    }
+
+    public void OnInstructorChange(ChangeEventArgs<string, Instructor> args)
+    {
+        TrainingProgram.InstructorId = int.Parse(args.Value);
+    }
+
+    public void ChangeTitle(string title)
+    {
+        Title = title;
+    }
+}
