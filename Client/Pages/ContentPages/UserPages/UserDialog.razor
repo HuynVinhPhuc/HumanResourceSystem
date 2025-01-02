@@ -1,7 +1,7 @@
-﻿<SfDialog Width="280px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+﻿<SfDialog Width="350px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
     <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
     <DialogTemplates>
-        <Header> Update Town </Header>
+        <Header> Update User </Header>
         <Content>
             <EditForm Model="ManageUser" Enhance OnSubmit="Save">
                 <div class="card border-success">
@@ -16,9 +16,9 @@
                         </div>
                         <div class="form-group mt-3 mb-3">
                             <label class="form-label">Select Role</label>
-                            @if (string.IsNullOrEmpty(ManageUser.Role))
+                            @if (ManageUser!.Role! != null)
                             {
-                                string selected = ManageUser!.Role;
+                                string selected = ManageUser!.Role!;
                                 <SfDropDownList TValue="string" TItem="SystemRole" Placeholder="@selected" DataSource="SystemRoles">
                                     <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
                                     <DropDownListEvents TValue="string" TItem="SystemRole" ValueChange="OnValueChange"></DropDownListEvents>
@@ -60,6 +60,12 @@
     public void OpenDialog()
     {
         IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void CloseDialog()
+    {
+        IsVisible = false;
         StateHasChanged();
     }
 

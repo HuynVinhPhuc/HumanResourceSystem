@@ -29,6 +29,7 @@ namespace ServerLibrary.Repositories.Implementations
                 Fullname = user.Fullname,
                 Email = user.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                EmployeeId = user.EmployeeId,
             });
 
             //check, create and assign role
@@ -40,17 +41,21 @@ namespace ServerLibrary.Repositories.Implementations
                 return new GeneralResponse(true, "Account created!");
             }
 
-            var checkUserRole = await appDbContext.SystemRoles.FirstOrDefaultAsync(_ => _.Name!.Equals(Constants.User));
+            var checkUserRole = await appDbContext.SystemRoles.FirstOrDefaultAsync(_ => _.Name!.Equals(Constants.Staff));
             SystemRole response = new();
             if (checkUserRole is null)
             {
-                response = await AddToDataBase(new SystemRole() { Name = Constants.User });
+                response = await AddToDataBase(new SystemRole() { Name = Constants.Staff });
                 await AddToDataBase(new UserRole() { RoleId = response.Id, UserId = applicationUser.Id });
             }
             else
             {
                 await AddToDataBase(new UserRole() { RoleId = checkUserRole.Id, UserId = applicationUser.Id });
             }
+
+            string message = $"Welcome aboard, {user.Fullname}! Your account has been successfully created.";
+            await AddNotification(user.EmployeeId, message);
+
             return new GeneralResponse(true, "Account created!");
 
         }
@@ -62,9 +67,42 @@ namespace ServerLibrary.Repositories.Implementations
             var applicationUser = await FindUserByEmail(user.Email!);
             if (applicationUser is null) return new LoginResponse(false, "User not found");
 
+            //Check locked account
+            if (applicationUser.LockoutEndTime.HasValue && applicationUser.LockoutEndTime > DateTime.Now)
+            {
+                var timeRemaining = applicationUser.LockoutEndTime.Value - DateTime.Now;
+                var minutes = (int)timeRemaining.TotalMinutes; // Tổng số phút
+                var seconds = timeRemaining.Seconds; // Số giây còn lại
+
+                return new LoginResponse(false, $"Account is locked. Try again after {minutes} minutes and {seconds} seconds.");
+            }
+
             //Verity password
             if (!BCrypt.Net.BCrypt.Verify(user.Password, applicationUser.Password))
+            {
+                if (!applicationUser.FailedLoginStart.HasValue || applicationUser.FailedLoginStart <= DateTime.Now.AddHours(-1))
+                {
+                    applicationUser.FailedLoginAttempts = 0;
+                    applicationUser.FailedLoginStart = DateTime.Now;
+                }
+                applicationUser.FailedLoginAttempts++;
+
+                if (applicationUser.FailedLoginAttempts >= 5)
+                {
+                    applicationUser.LockoutEndTime = DateTime.Now.AddMinutes(30);
+                    applicationUser.FailedLoginAttempts = 0;
+                    await appDbContext.SaveChangesAsync();
+                    return new LoginResponse(false, "Account locked due to too many failed login attempts.");
+                }
+
+                await appDbContext.SaveChangesAsync();
                 return new LoginResponse(false, "Email/Password not valid");
+            }
+
+            // Reset failed login attempts on successful login
+            applicationUser.FailedLoginAttempts = 0;
+            applicationUser.LockoutEndTime = null;
+            applicationUser.FailedLoginStart = null;
 
             var getUserRole = await FindUserRole(applicationUser.Id);
             if (getUserRole is null) return new LoginResponse(false, "user role not found");
@@ -148,6 +186,25 @@ namespace ServerLibrary.Repositories.Implementations
             return new LoginResponse(true, "Token refreshed successfully", jwtToken, refershToken);
         }
 
+        public async Task<GeneralResponse> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            if (request is null) return new GeneralResponse(false, "Model is empty");
+
+            var applicationUser = await appDbContext.ApplicationUsers.FindAsync(request.Id);
+            if (applicationUser is null) return new GeneralResponse(false, "User not found");
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, applicationUser.Password))
+                return new GeneralResponse(false, "Current password is incorrect");
+
+            applicationUser.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            appDbContext.ApplicationUsers.Update(applicationUser);
+            await appDbContext.SaveChangesAsync();
+
+            return new GeneralResponse(true, "Password changed successfully");
+        }
+
+
         public async Task<List<ManageUser>> GetUsers()
         {
             var allUsers = await GetApplicationUsers();
@@ -164,6 +221,14 @@ namespace ServerLibrary.Repositories.Implementations
                 users.Add(new ManageUser() { UserId = user.Id, Name = user.Fullname!, Email = user.Email!, Role = roleName!.Name! });
             }
             return users;
+        }
+
+        public async Task<ApplicationUser> GetUserById(int id)
+        {
+            var user = await appDbContext.ApplicationUsers
+            .FindAsync(id);
+
+            return user!;
         }
 
         public async Task<GeneralResponse> UpdateUser(ManageUser user)
@@ -183,6 +248,19 @@ namespace ServerLibrary.Repositories.Implementations
             appDbContext.ApplicationUsers.Remove(user!);
             await appDbContext.SaveChangesAsync();
             return new GeneralResponse(true, "User successfully deleted");
+        }
+
+        public async Task AddNotification(int employeeId, string message)
+        {
+            var notification = new Notification
+            {
+                EmployeeId = employeeId,
+                Message = message,
+                IsRead = false,
+                CreatedAt = DateTime.Now
+            };
+
+            appDbContext.Notifications.Add(notification);
         }
 
         private async Task<List<SystemRole>> SystemRoles() => await appDbContext.SystemRoles.AsNoTracking().ToListAsync();

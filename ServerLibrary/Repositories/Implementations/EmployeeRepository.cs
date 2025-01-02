@@ -14,8 +14,11 @@ namespace ServerLibrary.Repositories.Implementations
         {
             var item = await appDbContext.Employees.FindAsync(id);
             if (item is null) return NotFound();
+            int BranchId = item.BranchId;
+            appDbContext.Employees.Remove(item);            
 
-            appDbContext.Employees.Remove(item);
+            await UpdateEmployeeCount(BranchId, -1);
+
             await Commit();
             return Success();
         }
@@ -30,6 +33,7 @@ namespace ServerLibrary.Repositories.Implementations
             .Include(b => b.Branch)
             .ThenInclude(d => d.Department)
             .ThenInclude(gd => gd.GeneralDepartment)
+            .Include(u => u.ApplicationUser)
             .ToListAsync();
 
             return employees;
@@ -44,6 +48,7 @@ namespace ServerLibrary.Repositories.Implementations
             .Include(b => b.Branch)
             .ThenInclude(d => d.Department)
             .ThenInclude(gd => gd.GeneralDepartment)
+            .Include(u => u.ApplicationUser)
             .FirstOrDefaultAsync(ei => ei.Id == id);
 
             return employee!;
@@ -53,6 +58,9 @@ namespace ServerLibrary.Repositories.Implementations
         {
             if (!await CheckName(item.Name!)) return new GeneralResponse(false, $"{item.Name} already added");
             appDbContext.Employees.Add(item);
+
+            await UpdateEmployeeCount(item.BranchId, 1);
+
             await Commit();
             return Success();
         }
@@ -62,23 +70,43 @@ namespace ServerLibrary.Repositories.Implementations
             var findUser = await appDbContext.Employees.FirstOrDefaultAsync(e => e.Id == employee.Id);
             if (findUser is null) return new GeneralResponse(false, "Employee does not exist");
 
+            int OldBranchId = findUser.BranchId;
+
             findUser.Name = employee.Name;
-            findUser.Other = employee.Other;
+            findUser.Email = employee.Email;
+            findUser.Gender = employee.Gender;
+            findUser.DateOfBirth = employee.DateOfBirth;
+            findUser.CivilId = employee.CivilId;
+            findUser.FileNumber = employee.FileNumber;
+            findUser.JobName = employee.JobName;
+            findUser.Salary = employee.Salary;
             findUser.Address = employee.Address;
             findUser.TelephoneNumber = employee.TelephoneNumber;
+            findUser.Photo = employee.Photo;
+            findUser.Other = employee.Other;
+
             findUser.BranchId = employee.BranchId;
             findUser.Branch = employee.Branch;
             findUser.TownId = employee.TownId;
-            findUser.Town = employee.Town;
-            findUser.CivilId = employee.CivilId;
-            findUser.Email = employee.Email;
-            findUser.FileNumber = employee.FileNumber;
-            findUser.JobName = employee.JobName;
-            findUser.Photo = employee.Photo;
+            findUser.Town = employee.Town;           
 
-            await appDbContext.SaveChangesAsync();
+            if (OldBranchId != employee.BranchId)
+            {
+                await UpdateEmployeeCount(OldBranchId, -1);
+                await UpdateEmployeeCount(employee.BranchId, 1);
+            }
+
             await Commit();
             return Success();
+        }
+
+        public async Task UpdateEmployeeCount(int branchId, int Count)
+        {
+            var branch = await appDbContext.Branches.FindAsync(branchId);
+            if (branch != null)
+            {
+                branch.CurrentEmployees += Count;
+            }
         }
 
         private async Task Commit() => await appDbContext.SaveChangesAsync();
@@ -86,7 +114,7 @@ namespace ServerLibrary.Repositories.Implementations
         private static GeneralResponse Success() => new(true, "Process completed");
         private async Task<bool> CheckName(string name)
         {
-            var item = await appDbContext.Towns.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
+            var item = await appDbContext.Employees.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
             return item is null;
         }
     }

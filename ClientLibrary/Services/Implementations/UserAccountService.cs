@@ -44,6 +44,13 @@ namespace ClientLibrary.Services.Implementations
             return result!;
         }
 
+        public async Task<ApplicationUser> GetUserById(int id)
+        {
+            var httpClient = await getHttpClient.GetPrivateHttpClient();
+            var result = await httpClient.GetFromJsonAsync<ApplicationUser>($"{AuthUrl}/single/{id}");
+            return result!;
+        }
+
         public async Task<GeneralResponse> UpdateUser(ManageUser user)    
         {
             var httpClient = getHttpClient.GetPublicHttpClient();
@@ -63,6 +70,14 @@ namespace ClientLibrary.Services.Implementations
         {
             var httpClient = await getHttpClient.GetPrivateHttpClient();
             var result = await httpClient.DeleteAsync($"{AuthUrl}/delete-user/{id}");
+            if (!result.IsSuccessStatusCode) return new GeneralResponse(false, "Error occured");
+            return await result.Content.ReadFromJsonAsync<GeneralResponse>()!;
+        }
+
+        public async Task<GeneralResponse> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            var httpClient = getHttpClient.GetPublicHttpClient();
+            var result = await httpClient.PutAsJsonAsync($"{AuthUrl}/change-password", request);
             if (!result.IsSuccessStatusCode) return new GeneralResponse(false, "Error occured");
             return await result.Content.ReadFromJsonAsync<GeneralResponse>()!;
         }

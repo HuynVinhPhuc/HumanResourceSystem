@@ -1,4 +1,4 @@
-﻿<SfDialog Width="280px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+﻿<SfDialog Width="750px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
     <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
     <DialogTemplates>
         <Header> @Title Employee's Sanction </Header>
@@ -6,39 +6,59 @@
             <EditForm Model="ItemModel" Enhance OnSubmit="Save">
                 <div class="card border-success">
                     <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Employee Id</label>
-                            <input @bind="ItemModel.EmployeeId" class="form-control" disabled />
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-10">
+                                <div class="form-group">
+                                    <label class="form-label">Employee Id</label>
+                                    <input @bind="ItemModel.EmployeeId" class="form-control" disabled />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group mt-2">
-                            <label class="form-label">Ocurring Date</label>
-                            <InputDate @bind-Value="ItemModel.Date" class="form-control" />
-                        </div>
-                        <div class="form-group mt-2">
-                            <label class="form-label">Punishment Date</label>
-                            <InputDate @bind-Value="ItemModel.PunishmentDate" class="form-control" />
-                        </div>
-                        <div class="form-group mt-2">
-                            <label class="form-label">End Date</label>
-                            <InputTextArea @bind-Value="@ItemModel.Punishment" class="form-control" />
-                        </div>
-                        <div class="form-group mt-3 mb-3">
-                            <label class="form-label">Select Type</label>
-                            @if (ItemModel.SanctionType != null)
-                            {
-                                string selected = ItemModel.SanctionType!.Name!;
-                                <SfDropDownList TValue="string" TItem="SanctionType" Placeholder="@selected" DataSource="SanctionTypes">
-                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
-                                    <DropDownListEvents TValue="string" TItem="SanctionType" ValueChange="OnValueChange"></DropDownListEvents>
-                                </SfDropDownList>
-                            }
-                            else
-                            {
-                                <SfDropDownList TValue="string" TItem="SanctionType" Placeholder="Select Type" DataSource="SanctionTypes">
-                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
-                                    <DropDownListEvents TValue="string" TItem="SanctionType" ValueChange="OnValueChange"></DropDownListEvents>
-                                </SfDropDownList>
-                            }
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-5">
+                                <div class="form-group mt-1">
+                                    <label class="form-label">Employee Name</label>
+                                    <input @bind="EmployeeName" class="form-control" disabled />
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="form-label">Ocurring Date</label>
+                                    <InputDate @bind-Value="ItemModel.Date" class="form-control" disabled="@isDisabled" />
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="form-label">Punishment Date</label>
+                                    <InputDate @bind-Value="ItemModel.PunishmentDate" class="form-control" disabled="@isDisabled" />
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="form-label">Select Type</label>
+                                    @if (ItemModel.SanctionType != null)
+                                    {
+                                        string selected = ItemModel.SanctionType!.Name!;
+                                        <SfDropDownList TValue="string" TItem="SanctionType" Placeholder="@selected" DataSource="SanctionTypes" Enabled="!isDisabled">
+                                            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                            <DropDownListEvents TValue="string" TItem="SanctionType" ValueChange="OnValueChange"></DropDownListEvents>
+                                        </SfDropDownList>
+                                    }
+                                    else
+                                    {
+                                        <SfDropDownList TValue="string" TItem="SanctionType" Placeholder="Select Type" DataSource="SanctionTypes" Enabled="!isDisabled">
+                                            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                            <DropDownListEvents TValue="string" TItem="SanctionType" ValueChange="OnValueChange"></DropDownListEvents>
+                                        </SfDropDownList>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="form-group mt-1">
+                                    <label class="form-label">Punishment Content</label>
+                                    <InputTextArea @bind-Value="@ItemModel.Punishment" class="form-control" rows="4" disabled="@isDisabled" />
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="form-label">Description</label>
+                                    <InputTextArea @bind-Value="ItemModel.Description" class="form-control" rows="4" disabled="@isDisabled" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -46,7 +66,14 @@
         </Content>
     </DialogTemplates>
     <DialogButtons>
-        <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" OnClick="Save" />
+        @if (Title == "View")
+        {
+            <DialogButton Content="CLOSE" IsPrimary="true" OnClick="CloseDialog" />
+        }
+        else
+        {
+            <DialogButton Content="Save" IsPrimary="true" OnClick="Save" />
+        }
     </DialogButtons>
 </SfDialog>
 
@@ -55,8 +82,12 @@
     [Parameter] public List<SanctionType> SanctionTypes { get; set; } = new();
     [Parameter] public EventCallback<Sanction> HandleSaveOperationEvent { get; set; }
 
+    public string EmployeeName { get; set; }
+
     public string Title { get; set; } = "Add";
     private bool IsVisible { get; set; } = false;
+
+    private bool isDisabled => Title == "View";
 
     private async void Save()
     {
@@ -68,6 +99,7 @@
 
     public void OpenDialog()
     {
+        EmployeeName = ItemModel.Employee?.Name ?? "No Name";
         IsVisible = true;
         StateHasChanged();
     }

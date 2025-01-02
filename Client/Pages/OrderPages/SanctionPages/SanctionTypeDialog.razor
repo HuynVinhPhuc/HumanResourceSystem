@@ -10,6 +10,10 @@
                             <label class="form-label">Name</label>
                             <InputText @bind-Value="SanctionType.Name" class="form-control" />
                         </div>
+                        <div class="form-group mt-2">
+                            <label class="form-label">Description</label>
+                            <InputTextArea @bind-Value="SanctionType.Description" class="form-control" />
+                        </div>
                     </div>
                 </div>
             </EditForm>
@@ -38,6 +42,12 @@
     public void OpenDialog()
     {
         IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void CloseDialog()
+    {
+        IsVisible = false;
         StateHasChanged();
     }
 

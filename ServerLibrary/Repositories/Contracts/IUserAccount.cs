@@ -11,8 +11,11 @@ namespace ServerLibrary.Repositories.Contracts
         Task<LoginResponse> SignInAsync(Login user);
         Task<LoginResponse> RefreshTokenAsync(RefreshToken token);
         Task<List<ManageUser>> GetUsers();
+        Task<ApplicationUser> GetUserById(int id);
         Task<GeneralResponse> UpdateUser(ManageUser user);
         Task<List<SystemRole>> GetRoles();
         Task<GeneralResponse> DeleteUser(int id);
+        Task<GeneralResponse> ChangePasswordAsync(ChangePasswordRequest request);
+
     }
 }

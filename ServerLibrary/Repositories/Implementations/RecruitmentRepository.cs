@@ -44,6 +44,7 @@ namespace ServerLibrary.Repositories.Implementations
             recruitment.Description = item.Description;
             recruitment.PostingDate = item.PostingDate;
             recruitment.ClosingDate = item.ClosingDate;
+            recruitment.TotalPositions = item.TotalPositions;
             recruitment.BranchId = item.BranchId;
             recruitment.Branch = item.Branch;
             await Commit();

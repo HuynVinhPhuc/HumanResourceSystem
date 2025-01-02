@@ -10,6 +10,10 @@
                             <label class="form-label">Name</label>
                             <input @bind="OvertimeType.Name" class="form-control" />
                         </div>
+                        <div class="form-group mt-2">
+                            <label class="form-label">Description</label>
+                            <InputTextArea @bind-Value="OvertimeType.Description" class="form-control" />
+                        </div>
                     </div>
                 </div>
             </EditForm>
@@ -30,6 +34,12 @@
     public void OpenDialog()
     {
         IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void CloseDialog()
+    {
+        IsVisible = false;
         StateHasChanged();
     }
 

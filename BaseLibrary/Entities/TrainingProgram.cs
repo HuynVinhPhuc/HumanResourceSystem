@@ -13,9 +13,9 @@ namespace BaseLibrary.Entities
         // Certificate information
         public string? Certificate { get; set; } = string.Empty;
 
-        // Relationship: Many to many with Employee through Participant
+        // Relationship: Many to many with Employee through Degree
         [JsonIgnore]
-        public List<Participant>? Participants { get; set; }
+        public List<Degree>? Degrees { get; set; }
 
         // Relationship: Many to one with Instructor
         public Instructor? Instructor { get; set; }

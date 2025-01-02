@@ -15,6 +15,7 @@ namespace ServerLibrary.Repositories.Implementations
             if (dep is null) return NotFound();
 
             appDbContext.Departments.Remove(dep);
+
             await Commit();
             return Success();
         }
@@ -29,6 +30,7 @@ namespace ServerLibrary.Repositories.Implementations
         {
             if (!await CheckName(item.Name!)) return new GeneralResponse(false, $"{item.Name} already added");
             appDbContext.Departments.Add(item);
+
             await Commit();
             return Success();
         }
@@ -38,8 +40,14 @@ namespace ServerLibrary.Repositories.Implementations
             var dep = await appDbContext.Departments.FindAsync(item.Id);
             if (dep is null) return NotFound();
             dep.Name = item.Name;
+            dep.ManagerId = item.ManagerId;
+            dep.ManagerName = item.ManagerName;
+            dep.TelephoneNumber = item.TelephoneNumber;
+            dep.Email = item.Email;
+
             dep.GeneralDepartmentId = item.GeneralDepartmentId;
             dep.GeneralDepartment = item.GeneralDepartment;
+
             await Commit();
             return Success();
         }

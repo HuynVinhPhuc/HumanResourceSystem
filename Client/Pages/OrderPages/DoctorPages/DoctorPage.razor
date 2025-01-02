@@ -2,7 +2,7 @@
 
 @if (allState.ShowHealth)
 {
-    <div class="continer mt-5">
+    <div class="continer mt-4">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card border-warning shadow-lg">
@@ -60,8 +60,14 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await GetHealth();
         allState.Action += StateHasChanged;
+        allState.HealthAction += LoadDefaults;
+    }
+
+    private async void LoadDefaults()
+    {
+        await GetHealth();
+        StateHasChanged();
     }
 
     private async Task GetHealth() => Doctors = await doctorService.GetAll(Constants.DoctorBaseUrl);

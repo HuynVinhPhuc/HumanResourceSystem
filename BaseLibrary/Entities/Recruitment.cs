@@ -11,6 +11,8 @@ namespace BaseLibrary.Entities
         [Required]
         public string JobName { get; set; } = string.Empty;
         [Required]
+        public int TotalPositions { get; set; }
+        [Required]
         public DateTime PostingDate { get; set; }
         [Required]
         public DateTime ClosingDate { get; set; }

@@ -25,6 +25,13 @@ namespace Server.Controllers
             return Ok(await _periodicEvaluationInterface.GetAllByEmployeeId(id));
         }
 
+        [HttpGet("closest/{id}")]
+        public async Task<IActionResult> GetClosestByEmployeeId(int id)
+        {
+            if (id <= 0) return BadRequest("Bad request made");
+            return Ok(await _periodicEvaluationInterface.GetClosestByEmployeeId(id));
+        }
+
         [HttpPut("send-email/{message}")]
         public async Task<IActionResult> SendEmail(string message, PeriodicEvaluation model)
         {

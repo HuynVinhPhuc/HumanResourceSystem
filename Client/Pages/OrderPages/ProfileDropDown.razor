@@ -9,7 +9,7 @@
                 <div class="card-body">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <a class="text-primary fw-bold float-start text-decoration-none" style="font-family:Tahoma; cursor:pointer;">
+                            <a class="text-primary fw-bold float-start text-decoration-none" @onclick="ShowProfileClicked" style="font-family:Tahoma; cursor:pointer;">
                                 <i class="bi bi-person-gear"></i>
                                 Profile
                             </a>
@@ -31,6 +31,22 @@
 {
     public string ProfileImage { get; set; } = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        try
+        {
+            var CurrentUserId = await customAuthStateProvider.GetCurrentUserId();
+            var CurrentUser = await accountService.GetUserById(int.Parse(CurrentUserId));
+            var CurrentEmployee = await employeeService.GetById(CurrentUser.EmployeeId, Constants.EmployeeBaseUrl);
+            ProfileImage = CurrentEmployee.Photo;
+        }
+        catch
+        {
+            Console.WriteLine("Error");
+        }   
+    }
+
     async Task LogoutClicked()
     {
         var logoutModel = new UserSession();
@@ -38,4 +54,9 @@
         await customAuthStateProvider.UpdateAuthenticationState(logoutModel);
         NavManager.NavigateTo("/identity/account/login", replace: true, forceLoad: true);
     }
+
+    void ShowProfileClicked() => allState.ProfileClicked();
+
+    public void Dispose() => allState.Action -= StateHasChanged;
+
 }

@@ -40,6 +40,7 @@ namespace ServerLibrary.Repositories.Implementations
             var obj = await appDbContext.VacationsTypes.FindAsync(item.Id);
             if (obj is null) return NotFound();
             obj.Name = item.Name;
+            obj.Description = item.Description;
             await Commit();
             return Success();
         }

@@ -1,3 +1,4 @@
+using BaseLibrary.DTOs;
 using BaseLibrary.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +49,7 @@ builder.Services.AddScoped<IUserAccount, UserAccountRepository>();
 
 builder.Services.AddScoped<IGenericRepositoryInterface<GeneralDepartment>, GeneralDepartmentRepository>();
 builder.Services.AddScoped<IGenericRepositoryInterface<Department>, DepartmentRepository>();
-builder.Services.AddScoped<IGenericRepositoryInterface<Branch>, BranchRepository>();
+builder.Services.AddScoped<IBranchInterface, BranchRepository>();
 
 builder.Services.AddScoped<IGenericRepositoryInterface<Country>, CountryRepository>();
 builder.Services.AddScoped<IGenericRepositoryInterface<City>, CityRepository>();
@@ -70,11 +71,17 @@ builder.Services.AddScoped<ICandidateInterface, CandidateRepository>();
 
 builder.Services.AddScoped<IGenericRepositoryInterface<TrainingProgram>, TrainingProgramRepository>();
 builder.Services.AddScoped<IGenericRepositoryInterface<Instructor>, InstructorRepository>();
-builder.Services.AddScoped<IParticipantInterface, ParticipantRepository>();
+builder.Services.AddScoped<IDegreeInterface, DegreeRepository>();
 
 builder.Services.AddScoped<IPeriodicEvaluationInterface, PeriodicEvaluationRepository>();
 
+builder.Services.AddScoped<IBonusInterface, BonusRepository>();
+
+builder.Services.AddScoped<IEmployeeTransferInterface, EmployeeTransferRepository>();
+
 builder.Services.AddScoped<IGenericRepositoryInterface<Employee>, EmployeeRepository>();
+
+builder.Services.AddScoped<INotificationInterface, NotificationRepository>();
 
 // Configure CORS
 builder.Services.AddCors(options =>

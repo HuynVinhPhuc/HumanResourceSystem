@@ -2,41 +2,47 @@
 
 @if (allState.ShowCandidate)
 {
-    <div class="container-fluid mt-5">
+    <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
                         <h4 class="float-start">Candidate</h4>
-                        <button class="btn btn-outline-success float-end" @onclick="OpenDialog"><i class="bi bi-plus-circle-dotted"> </i> Add Candidate</button>
+                        <button class="btn btn-outline-success float-end" @onclick="AddClicked"><i class="bi bi-plus-circle-dotted"> </i> Add Candidate</button>
                     </div>
                     <div class="card-body">
                         @{
                             var Tool = (new List<string>() { "Search", "ExcelExport", "PdfExport", "Print" });
                         }
                         <SfGrid DataSource="@Candidates" AllowPaging="true" AllowSorting="true" Toolbar=@Tool AllowExcelExport="true" @ref="DefaultGrid" AllowPdfExport="true">
-                            <GridPageSettings PageSize="5"></GridPageSettings>
-                            <GridEvents OnToolbarClick="ToolbarClickHanlder" TValue="Candidate"></GridEvents>
+                            <GridPageSettings PageSize="10"></GridPageSettings>
+                            <GridEvents OnToolbarClick="ToolbarClickHanlder" TValue="CandidateData"></GridEvents>
                             <GridColumns>
-                                <GridColumn Field=@nameof(Candidate.Id) HeaderText="ID"></GridColumn>
-                                <GridColumn Field=@nameof(Candidate.Name) HeaderText="Name"></GridColumn>
-                                <GridColumn Field=@nameof(Candidate.Address) HeaderText="Address"></GridColumn>
-                                <GridColumn Field=@nameof(Candidate.TelephoneNumber) HeaderText="Telephone"></GridColumn>
-                                <GridColumn Field=@nameof(Candidate.ApplicationDate) HeaderText="Application Date"></GridColumn>
-                                <GridColumn Field=@nameof(Candidate.Status) HeaderText="Status"></GridColumn>
+                                <GridColumn Field=@nameof(CandidateData.Id) HeaderText="ID" Width="50"></GridColumn>
+                                <GridColumn Field=@nameof(CandidateData.Name) HeaderText="Name"></GridColumn>
+                                <GridColumn Field=@nameof(CandidateData.Address) HeaderText="Address"></GridColumn>
+                                <GridColumn Field=@nameof(CandidateData.Telephone) HeaderText="Telephone"></GridColumn>
+                                <GridColumn Field=@nameof(CandidateData.ApplicationDate) HeaderText="Application Date"></GridColumn>
+                                <GridColumn Field=@nameof(CandidateData.Status) HeaderText="Status"></GridColumn>
                                 <GridColumn Width="75px" HeaderText="Action" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Center">
                                     <Template>
                                         @{
-                                            var item = (context as Candidate);
-                                            <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="() => EditClicked(item)">&#160;</i>
-                                            <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item)"></i>
+                                            var item = (context as CandidateData);
+                                            @if (item!.Candidate!.Status != "Be employee")
+                                            {
+                                                <i class="bi bi-pencil text-primary" id="cursorStyle" @onclick="() => EditClicked(item!.Candidate!)"></i>
+                                                <span> </span>
+                                                <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item!.Candidate!)"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-eye text-info" id="cursorStyle" @onclick="() => ShowClicked(item!.Candidate!)"></i>
+                                            }
                                         }
                                     </Template>
                                 </GridColumn>
                             </GridColumns>
                         </SfGrid>
-                    </div>
-                    <div class="card-footer">
                     </div>
                 </div>
             </div>
@@ -50,24 +56,64 @@
                  Recruitments="Recruitments" />
 
 @code {
-    private SfGrid<Candidate>? DefaultGrid;
+    private SfGrid<CandidateData>? DefaultGrid;
     CandidateDialog? candidateDialog;
     Candidate Candidate = new();
-    public List<Candidate> Candidates { get; set; } = new();
+    public List<Candidate> CandidatesData { get; set; } = new();
     public List<Recruitment> Recruitments { get; set; } = new();
 
-    public string OldStatus;
+    public string? OldStatus;
+
+    public class CandidateData
+    {
+        public Candidate? Candidate { get; set; }
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Address { get; set; }
+        public string? Telephone { get; set; }
+        public string? ApplicationDate { get; set; }
+        public string? Status { get; set; }
+    }
+
+    public List<CandidateData> Candidates { get; set; } = new List<CandidateData>();
 
     protected override async Task OnInitializedAsync()
     {
-        await GetRecruitments();
-        await GetCandidates();
         allState.Action += StateHasChanged;
+        allState.CandidateAction += LoadDefaults;
+    }
+
+    private async void LoadDefaults()
+    {
+        await GetCandidates();
+        await GetRecruitments();
+        StateHasChanged();
     }
 
     private async Task GetRecruitments() => Recruitments = await recruitmentService.GetAll(Constants.RecruitmentBaseUrl);
 
-    private async Task GetCandidates() => Candidates = await candidateService.GetAll(Constants.CandidateBaseUrl);
+    private async Task GetCandidates()
+    {
+        CandidatesData = await candidateService.GetAll(Constants.CandidateBaseUrl);
+        await GetCandidateData();
+    }
+
+    private async Task GetCandidateData()
+    {
+        Candidates = CandidatesData
+        .Select(s => new CandidateData
+            {
+                Candidate = s,
+                Id = s.Id,
+                Name = s.Name,
+                Address = s.Address,
+                Telephone = s.TelephoneNumber,
+                ApplicationDate = s.ApplicationDate.ToString("MM/dd/yyyy"),
+                Status = s.Status
+            })
+        .Reverse()
+        .ToList();
+    }
 
     void OpenDialog() => candidateDialog?.OpenDialog();
 
@@ -87,11 +133,21 @@
         }
         if (successCheck)
         {
-            if (item.Status != "Pending" && item.Status != "Be employee" && OldStatus != item.Status) await candidateService.SendEmail(item, Constants.CandidateBaseUrl);
+            if (item.Status != "Pending" && item.Status != "Be employee" && OldStatus != item.Status && Candidate.Id > 0) candidateService.SendEmail(item, Constants.CandidateBaseUrl);
             Candidate = new();
             await GetCandidates();
             candidateDialog?.ChangeTitle("Add");
+            candidateDialog?.CloseDialog();
+            StateHasChanged();
         }
+    }
+
+    // Edit
+    private void AddClicked()
+    {
+        candidateDialog?.ChangeTitle("Add");
+        Candidate = new();
+        OpenDialog();
     }
 
     // Edit
@@ -112,6 +168,14 @@
         var response = await candidateService.DeleteById(item.Id, Constants.CandidateBaseUrl);
         var result = await DisplayMessage(response.Flag, response.Message);
         if (result) await GetCandidates();
+    }
+
+    // Show
+    private void ShowClicked(Candidate item)
+    {
+        Candidate = item;
+        candidateDialog?.ChangeTitle("View");
+        OpenDialog();
     }
 
     private async Task<bool> DisplayMessage(bool flag, string message)

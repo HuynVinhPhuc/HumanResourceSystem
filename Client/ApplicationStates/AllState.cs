@@ -4,6 +4,32 @@
     {
         // Scope action
         public Action? Action { get; set; }
+        public Action? GeneralDepartmentAction { get; set; }
+        public Action? DepartmentAction { get; set; }
+        public Action? BranchAction { get; set; }
+        public Action? CountryAction { get; set; }
+        public Action? CityAction { get; set; }
+        public Action? TownAction { get; set; }
+        public Action? UserAction { get; set; }
+        public Action? HealthAction { get; set; }
+        public Action? OvertimeAction { get; set; }
+        public Action? OvertimeTypeAction { get; set; }
+        public Action? SanctionAction { get; set; }
+        public Action? SanctionTypeAction { get; set; }
+        public Action? VacationAction { get; set; }
+        public Action? VacationTypeAction { get; set; }
+        public Action? RecruitmentAction { get; set; }
+        public Action? CandidateAction { get; set; }
+        public Action? EmployeeAction { get; set; }
+        public Action? BonusAction { get; set; }
+        public Action? InstructorAction { get; set; }
+        public Action? TrainingProgramAction { get; set; }
+        public Action? PeriodicEvaluationAction { get; set; }
+        public Action? PeerEvaluationAction { get; set; }
+        public Action? StatisticalAction { get; set; }
+        public Action? ProfileAction { get; set; }
+        public Action? WorkProfileAction { get; set; }
+        public Action? EmployeeTransferAction { get; set; }
 
         // General Department
         public bool ShowGeneralDepartment { get; set; }
@@ -11,6 +37,7 @@
         {
             ResetAllDepartments();
             ShowGeneralDepartment = true;
+            GeneralDepartmentAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -20,6 +47,7 @@
         {
             ResetAllDepartments();
             ShowDepartment = true;
+            DepartmentAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -29,6 +57,7 @@
         {
             ResetAllDepartments();
             ShowBranch = true;
+            BranchAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -38,6 +67,7 @@
         {
             ResetAllDepartments();
             ShowCountry = true;
+            CountryAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -47,6 +77,7 @@
         {
             ResetAllDepartments();
             ShowCity = true;
+            CityAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -56,6 +87,7 @@
         {
             ResetAllDepartments();
             ShowTown = true;
+            TownAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -65,6 +97,7 @@
         {
             ResetAllDepartments();
             ShowUser = true;
+            UserAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -74,6 +107,7 @@
         {
             ResetAllDepartments();
             ShowHealth = true;
+            HealthAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -83,6 +117,7 @@
         {
             ResetAllDepartments();
             ShowOvertime = true;
+            OvertimeAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -92,6 +127,7 @@
         {
             ResetAllDepartments();
             ShowOvertimeType = true;
+            OvertimeTypeAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -101,6 +137,7 @@
         {
             ResetAllDepartments();
             ShowSanction = true;
+            SanctionAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -110,6 +147,7 @@
         {
             ResetAllDepartments();
             ShowSanctionType = true;
+            SanctionTypeAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -119,6 +157,7 @@
         {
             ResetAllDepartments();
             ShowVacation = true;
+            VacationAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -128,6 +167,7 @@
         {
             ResetAllDepartments();
             ShowVacationType = true;
+            VacationTypeAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -137,6 +177,7 @@
         {
             ResetAllDepartments();
             ShowRecruitment = true;
+            RecruitmentAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -146,6 +187,7 @@
         {
             ResetAllDepartments();
             ShowCandidate = true;
+            CandidateAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -155,6 +197,7 @@
         {
             ResetAllDepartments();
             ShowInstructor = true;
+            InstructorAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -164,6 +207,7 @@
         {
             ResetAllDepartments();
             ShowTrainingProgram = true;
+            TrainingProgramAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -176,21 +220,73 @@
             Action?.Invoke();
         }
 
-        // Test
+        // Peer Evaluation
+        public bool ShowPeerEvaluation { get; set; }
+        public void PeerEvaluationClicked()
+        {
+            ResetAllDepartments();
+            ShowPeerEvaluation = true;
+            PeriodicEvaluationAction?.Invoke();
+            Action?.Invoke();
+        }
+
+        // Statistical
         public bool ShowStatistical { get; set; }
         public void StatisticalClicked()
         {
             ResetAllDepartments();
             ShowStatistical = true;
+            StatisticalAction?.Invoke();
             Action?.Invoke();
         }
 
         // Employee
-        public bool ShowEmployee { get; set; } = true;
+        public bool ShowEmployee { get; set; }
         public void EmployeeClicked()
         {
             ResetAllDepartments();
             ShowEmployee = true;
+            EmployeeAction?.Invoke();
+            Action?.Invoke();
+        }
+
+        // Bonus
+        public bool ShowBonus { get; set; }
+        public void BonusClicked()
+        {
+            ResetAllDepartments();
+            ShowBonus = true;
+            BonusAction?.Invoke();
+            Action?.Invoke();
+        }
+
+        // Profile
+        public bool ShowProfile { get; set; } = true;
+        public void ProfileClicked()
+        {
+            ResetAllDepartments();
+            ShowProfile = true;
+            ProfileAction?.Invoke();
+            Action?.Invoke();
+        }
+
+        // Profile
+        public bool ShowWorkProfile { get; set; }
+        public void WorkProfileClicked()
+        {
+            ResetAllDepartments();
+            ShowWorkProfile = true;
+            WorkProfileAction?.Invoke();
+            Action?.Invoke();
+        }
+
+        // EmployeeTransfer
+        public bool ShowEmployeeTransfer { get; set; }
+        public void EmployeeTransferClicked()
+        {
+            ResetAllDepartments();
+            ShowEmployeeTransfer = true;
+            EmployeeTransferAction?.Invoke();
             Action?.Invoke();
         }
 
@@ -213,10 +309,15 @@
             ShowRecruitment = false;
             ShowCandidate = false;
             ShowEmployee = false;
+            ShowBonus = false;
             ShowInstructor = false;
             ShowTrainingProgram = false;
             ShowPeriodicEvaluation = false;
+            ShowPeerEvaluation = false;
             ShowStatistical = false;
+            ShowProfile = false;
+            ShowWorkProfile = false;
+            ShowEmployeeTransfer = false;
         }
     }
 }

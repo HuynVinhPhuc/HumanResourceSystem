@@ -2,7 +2,7 @@
 
 @if (allState.ShowBranch)
 {
-    <div class="continer mt-5">
+    <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
@@ -19,6 +19,11 @@
                                         <th scope="col">Id</th>
                                         <th scope="col">Department</th>
                                         <th scope="col">Branch</th>
+                                        <th scope="col">Supervisor</th>
+                                        <th scope="col">Telephone</th>
+                                        <th scope="col">Required Emp</th>
+                                        <th scope="col">Current Emp</th>
+                                        <th scope="col">Transfer Emp</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
@@ -33,6 +38,11 @@
                                                 <td>@item.Id</td>
                                                 <td>@item.Department!.Name</td>
                                                 <td>@item.Name</td>
+                                                <td>@item.SupervisorName</td>
+                                                <td>@item.TelephoneNumber</td>
+                                                <td>@item.RequiredEmployees</td>
+                                                <td>@item.CurrentEmployees</td>
+                                                <td>@item.CurrentEmployeeTransfers</td>
                                                 <td>
                                                     <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="() => EditClicked(item)"></i>&#160;
                                                     <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item)"></i>
@@ -77,9 +87,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        allState.Action += StateHasChanged;
+        allState.BranchAction += LoadDefaults;
+    }
+
+    private async void LoadDefaults()
+    {
         await GetBranches();
         await GetDepartments();
-        allState.Action += StateHasChanged;
+        StateHasChanged();
     }
 
     private async Task GetBranches()
@@ -99,10 +115,7 @@
         OpenDialog();
     }
 
-    void OpenDialog()
-    {
-        branchDialog?.OpenDialog();
-    }
+    void OpenDialog() => branchDialog?.OpenDialog();
 
     //Add or Update
     private async Task HandleSaveOperationEvent()
@@ -123,6 +136,7 @@
             Branch = new();
             await GetBranches();
             branchDialog?.ChangeTitle("Add");
+            branchDialog?.CloseDialog();
         }
     }
 

@@ -12,8 +12,20 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-1"></div>
-                            <div class="col-lg-5">
+                            <div class="col-lg-5">                                                               
                                 <div class="form-group">
+                                    <label class="form-label">Gender</label>
+                                    <SfDropDownList TValue="string" TItem="StatusType" Placeholder="Selected Gender" DataSource="LocalData">
+                                        <DropDownListFieldSettings Value="Text" Text="Text"></DropDownListFieldSettings>
+                                        <DropDownListEvents TValue="string" TItem="StatusType" ValueChange="OnGenderChange"></DropDownListEvents>
+                                    </SfDropDownList>
+                                </div>     
+                                <div class="form-group mt-2">
+                                    <label class="form-label">Date Of Birth</label>
+                                    <InputDate @bind-Value="Employee.DateOfBirth" class="form-control" />
+                                    @* <ValidationMessage For="() => EmployeeGroup1.CivilId" class="text-danger" /> *@
+                                </div>
+                                <div class="form-group mt-2">
                                     <label class="form-label">Civil Id</label>
                                     <InputText @bind-Value="Employee.CivilId" class="form-control" />
                                     @* <ValidationMessage For="() => EmployeeGroup1.CivilId" class="text-danger" /> *@
@@ -21,9 +33,9 @@
                                 <div class="form-group mt-2">
                                     <label class="form-label">File Number</label>
                                     <InputText @bind-Value="Employee.FileNumber" class="form-control" />
-                                    @* <ValidationMessage For="() => EmployeeGroup1.FileNumber" class="text-danger" /> *@
-                                </div>
-                                <div class="form-group mt-3">
+                                    @* <ValidationMessage For="() => EmployeeGroup1.CivilId" class="text-danger" /> *@
+                                </div>                                
+                                <div class="form-group mt-2">
                                     <label class="form-label @(ImageUploadMessage == ""?"":"text-danger")">
                                         @(ImageUploadMessage == "" ? "Upload Image" : ImageUploadMessage)
                                     </label>
@@ -31,8 +43,13 @@
                                     @* <ValidationMessage For="() => EmployeeGroup1.Photo" class="text-danger" /> *@
                                 </div>
                             </div>
-                            <div class="col-lg-5 mt-2">
+                            <div class="col-lg-5">
                                 <div class="form-group">
+                                    <label class="form-label">Salary</label>
+                                    <InputNumber @bind-Value="Employee.Salary" class="form-control" />
+                                    @* <ValidationMessage For="() => EmployeeGroup1.FileNumber" class="text-danger" /> *@
+                                </div>
+                                <div class="form-group mt-2">
                                     <label class="form-label">Select Country</label>
                                     <SfDropDownList TValue="string" TItem="Country" Placeholder="Select Country" DataSource="Countries">
                                         <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
@@ -46,7 +63,7 @@
                                         <DropDownListEvents TValue="string" TItem="City" ValueChange="OnCityValueChange"></DropDownListEvents>
                                     </SfDropDownList>
                                 </div>
-                                <div class="form-group mt-3">
+                                <div class="form-group mt-2">
                                     <label class="form-label">Select Town</label>
                                     <SfDropDownList TValue="string" TItem="Town" Placeholder="Select Town" DataSource="SelectedTowns">
                                         <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
@@ -86,12 +103,21 @@
     public List<City> SelectedCities { get; set; } = new();
     public List<Town> SelectedTowns { get; set; } = new();
 
+    public class StatusType
+    {
+        public string Text { get; set; }
+    }
+    List<StatusType> LocalData = new List<StatusType> {
+    new StatusType() { Text= "Male" },
+    new StatusType() { Text= "Female" },
+    };
+
     protected async override Task OnInitializedAsync()
     {
-        await LoadDefaults();
+        allState.CandidateAction += LoadDefaults;
     }
 
-    private async Task LoadDefaults()
+    private async void LoadDefaults()
     {
         Countries = await countryService.GetAll(Constants.CountryBaseUrl);
         Cities = await cityService.GetAll(Constants.CityBaseUrl);
@@ -135,6 +161,17 @@
     {
         IsVisible = true;
         StateHasChanged();
+    }
+
+    public void CloseDialog()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    public void OnGenderChange(ChangeEventArgs<string, StatusType> args)
+    {
+        Employee.Gender = args.Value.ToString();
     }
 
     // File Upload

@@ -41,29 +41,29 @@ namespace ServerLibrary.Data
         public DbSet<Recruitment> Recruitments { get; set; }
         public DbSet<Candidate> Candidates { get; set; }
 
-        // TrainingProgram / Participant / Instructor
+        // TrainingProgram / Degree / Instructor
         public DbSet<TrainingProgram> TrainingPrograms { get; set; }
-        public DbSet<Participant> Participants { get; set; }
+        public DbSet<Degree> Degrees { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
 
         //PeriodicEvaluation
         public DbSet<PeriodicEvaluation> PeriodicEvaluations { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //Bonus
+        public DbSet<Bonus> Bonuses { get; set; }
+
+        //EmployeeTransfer
+        public DbSet<EmployeeTransfer> EmployeeTransfers { get; set; }
+
+        //Notification
+        public DbSet<Notification> Notifications { get; set; }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Configuring the many-to-many relationship between TrainingProgram and Employee through Participant
-            modelBuilder.Entity<Participant>()
-                .HasKey(p => new { p.TrainingProgramId, p.EmployeeId });
-
-            modelBuilder.Entity<Participant>()
-                .HasOne(p => p.TrainingProgram)
-                .WithMany(tp => tp.Participants)
-                .HasForeignKey(p => p.TrainingProgramId);
-
-            modelBuilder.Entity<Participant>()
-                .HasOne(p => p.Employee)
-                .WithMany(e => e.Participants)
-                .HasForeignKey(p => p.EmployeeId);
+            optionsBuilder.UseSqlServer(
+                "Server=(local); Database=DemoEmployeeDb; Trusted_Connection=True; Trust Server Certificate=True;",
+                sqlServerOptions => sqlServerOptions.CommandTimeout(120) 
+            );
         }
+
     }
 }

@@ -14,5 +14,7 @@ namespace BaseLibrary.DTOs
         [Compare(nameof(Password))]
         [Required]
         public string? ConfirmPassword { get; set; }
+        [Required, Range(1, 99999, ErrorMessage = "You must select employee")]
+        public int EmployeeId { get; set; }
     }
 }

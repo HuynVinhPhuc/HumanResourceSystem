@@ -42,6 +42,14 @@ namespace Server.Controllers
             return Ok(users);
         }
 
+        [HttpGet("single/{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await accountInterface.GetUserById(id);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
         [HttpPut("update-user")]
         public async Task<IActionResult> UpdateUser(ManageUser manageUser)
         {
@@ -61,6 +69,13 @@ namespace Server.Controllers
         public async Task<IActionResult> DeleteUser(int id)
         {
             var result = await accountInterface.DeleteUser(id);
+            return Ok(result);
+        }
+
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            var result = await accountInterface.ChangePasswordAsync(request);
             return Ok(result);
         }
 

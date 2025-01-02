@@ -1,3 +1,4 @@
+using Append.Blazor.Printing;
 using BaseLibrary.Entities;
 using Blazored.LocalStorage;
 using Client;
@@ -10,12 +11,11 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Syncfusion.Blazor;
 using Syncfusion.Blazor.Popups;
-using Syncfusion.Licensing;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 // Register Syncfusion license
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCeUx0Qnxbf1x0ZFZMYV5bQHVPMyBoS35RckVlW3hedHVWQ2VdVU11");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIfEx3Qnxbf1x0ZFdMY1VbQX5PIiBoS35RckRiWHhfdHdcQ2lUUEF1");
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -26,6 +26,8 @@ builder.Services.AddHttpClient("SystemApiClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:3000/");
 }).AddHttpMessageHandler<CustomHttpHandler>();
+
+builder.Services.AddScoped<IPrintingService, PrintingService>();
 
 // Add required services for authentication, local storage, and HTTP client
 builder.Services.AddAuthorizationCore();
@@ -38,7 +40,7 @@ builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 // General Department / Department / Branch
 builder.Services.AddScoped<IGenericServiceInterface<GeneralDepartment>, GenericServiceImplementation<GeneralDepartment>>();
 builder.Services.AddScoped<IGenericServiceInterface<Department>, GenericServiceImplementation<Department>>();
-builder.Services.AddScoped<IGenericServiceInterface<Branch>, GenericServiceImplementation<Branch>>();
+builder.Services.AddScoped<IBranchService, BranchService>();
 
 // Country / City / Town
 builder.Services.AddScoped<IGenericServiceInterface<Country>, GenericServiceImplementation<Country>>();
@@ -61,13 +63,22 @@ builder.Services.AddScoped<ICandidateService, CandidateService>();
 
 builder.Services.AddScoped<IGenericServiceInterface<TrainingProgram>, GenericServiceImplementation<TrainingProgram>>();
 builder.Services.AddScoped<IGenericServiceInterface<Instructor>, GenericServiceImplementation<Instructor>>();
-builder.Services.AddScoped<IParticipantService, ParticipantService>();
+builder.Services.AddScoped<IDegreeService, DegreeService>();
 
-// PeriodicEvaluation
+// Periodic Evaluation
 builder.Services.AddScoped<IPeriodicEvaluationService, PeriodicEvaluationService>();
+
+// Bonus
+builder.Services.AddScoped<IBonusService, BonusService>();
+
+// Employee Transfer
+builder.Services.AddScoped<IEmployeeTransferService, EmployeeTransferService>();
 
 // Employee
 builder.Services.AddScoped<IGenericServiceInterface<Employee>, GenericServiceImplementation<Employee>>();
+
+// Employee
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddScoped<AllState>();
 

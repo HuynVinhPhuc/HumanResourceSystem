@@ -33,15 +33,62 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FailedLoginStart")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Fullname")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LockoutEndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
                     b.ToTable("ApplicationUsers");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.Bonus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BonusAmount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("BonusDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Bonuses");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Branch", b =>
@@ -52,11 +99,32 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CurrentEmployeeTransfers")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CurrentEmployees")
+                        .HasColumnType("int");
+
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RequiredEmployees")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupervisorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SupervisorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelephoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -149,6 +217,42 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("Countries");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Entities.Degree", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DegreeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DegreeInstitution")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TrainingProgramId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("TrainingProgramId");
+
+                    b.ToTable("Degrees");
+                });
+
             modelBuilder.Entity("BaseLibrary.Entities.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -157,11 +261,23 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("GeneralDepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelephoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -195,6 +311,8 @@ namespace ServerLibrary.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId");
+
                     b.ToTable("Doctors");
                 });
 
@@ -217,11 +335,18 @@ namespace ServerLibrary.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FileNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -240,6 +365,9 @@ namespace ServerLibrary.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Salary")
+                        .HasColumnType("int");
+
                     b.Property<string>("TelephoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -256,6 +384,50 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Entities.EmployeeTransfer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeRequest")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmployeeRequestName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewPosition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeTransfers");
+                });
+
             modelBuilder.Entity("BaseLibrary.Entities.GeneralDepartment", b =>
                 {
                     b.Property<int>("Id")
@@ -264,8 +436,23 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("DirectorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DirectorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelephoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -306,6 +493,34 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("Instructors");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("BaseLibrary.Entities.Overtime", b =>
                 {
                     b.Property<int>("Id")
@@ -313,6 +528,9 @@ namespace ServerLibrary.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -326,7 +544,12 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("OvertimeTypeId");
 
@@ -341,6 +564,9 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -350,21 +576,6 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("OvertimeTypes");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Entities.Participant", b =>
-                {
-                    b.Property<int>("TrainingProgramId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TrainingProgramId", "EmployeeId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("Participants");
-                });
-
             modelBuilder.Entity("BaseLibrary.Entities.PeriodicEvaluation", b =>
                 {
                     b.Property<int>("Id")
@@ -372,6 +583,9 @@ namespace ServerLibrary.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssessorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
@@ -437,6 +651,9 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateTime>("PostingDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("TotalPositions")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
@@ -474,6 +691,9 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
@@ -489,6 +709,8 @@ namespace ServerLibrary.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId");
+
                     b.HasIndex("SanctionTypeId");
 
                     b.ToTable("Sanctions");
@@ -501,6 +723,9 @@ namespace ServerLibrary.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -613,6 +838,9 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
@@ -622,10 +850,16 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("VacationTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("VacationTypeId");
 
@@ -640,6 +874,9 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -647,6 +884,28 @@ namespace ServerLibrary.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VacationsTypes");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithOne("ApplicationUser")
+                        .HasForeignKey("BaseLibrary.Entities.ApplicationUser", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.Bonus", b =>
+                {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany("Bonuses")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Branch", b =>
@@ -682,6 +941,23 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Entities.Degree", b =>
+                {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany("Degrees")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseLibrary.Entities.TrainingProgram", "TrainingProgram")
+                        .WithMany("Degrees")
+                        .HasForeignKey("TrainingProgramId");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TrainingProgram");
+                });
+
             modelBuilder.Entity("BaseLibrary.Entities.Department", b =>
                 {
                     b.HasOne("BaseLibrary.Entities.GeneralDepartment", "GeneralDepartment")
@@ -691,6 +967,17 @@ namespace ServerLibrary.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("GeneralDepartment");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.Doctor", b =>
+                {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Employee", b =>
@@ -712,34 +999,38 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("Town");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Entities.EmployeeTransfer", b =>
+                {
+                    b.HasOne("BaseLibrary.Entities.Branch", "Branch")
+                        .WithMany("EmployeeTransfers")
+                        .HasForeignKey("BranchId");
+
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany("EmployeeTransfers")
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("BaseLibrary.Entities.Overtime", b =>
                 {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BaseLibrary.Entities.OvertimeType", "OvertimeType")
                         .WithMany("Overtimes")
                         .HasForeignKey("OvertimeTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("OvertimeType");
-                });
-
-            modelBuilder.Entity("BaseLibrary.Entities.Participant", b =>
-                {
-                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
-                        .WithMany("Participants")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BaseLibrary.Entities.TrainingProgram", "TrainingProgram")
-                        .WithMany("Participants")
-                        .HasForeignKey("TrainingProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Employee");
 
-                    b.Navigation("TrainingProgram");
+                    b.Navigation("OvertimeType");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.PeriodicEvaluation", b =>
@@ -766,11 +1057,19 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.Sanction", b =>
                 {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BaseLibrary.Entities.SanctionType", "SanctionType")
                         .WithMany("Sanctions")
                         .HasForeignKey("SanctionTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Employee");
 
                     b.Navigation("SanctionType");
                 });
@@ -799,17 +1098,27 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.Vacation", b =>
                 {
+                    b.HasOne("BaseLibrary.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BaseLibrary.Entities.VacationType", "VacationType")
                         .WithMany("Vacations")
                         .HasForeignKey("VacationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Employee");
+
                     b.Navigation("VacationType");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Branch", b =>
                 {
+                    b.Navigation("EmployeeTransfers");
+
                     b.Navigation("Employees");
 
                     b.Navigation("Recruitments");
@@ -832,7 +1141,13 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.Employee", b =>
                 {
-                    b.Navigation("Participants");
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Bonuses");
+
+                    b.Navigation("Degrees");
+
+                    b.Navigation("EmployeeTransfers");
 
                     b.Navigation("PeriodicEvaluations");
                 });
@@ -869,7 +1184,7 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.TrainingProgram", b =>
                 {
-                    b.Navigation("Participants");
+                    b.Navigation("Degrees");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.VacationType", b =>

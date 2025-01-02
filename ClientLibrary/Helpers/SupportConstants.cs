@@ -27,8 +27,10 @@ namespace ClientLibrary.Helpers
 
         public const string TrainingProgramBaseUrl = "api/trainingprogram";
         public const string InstructorBaseUrl = "api/instructor";
-        public const string ParticipantBaseUrl = "api/participant";
+        public const string DegreeBaseUrl = "api/degree";
 
         public const string PeriodicEvaluationBaseUrl = "api/periodicevaluation";
+
+        public const string BonusBaseUrl = "api/bonus";
     }
 }

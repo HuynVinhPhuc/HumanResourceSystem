@@ -10,7 +10,7 @@ namespace ServerLibrary.Repositories.Implementations
     {
         public async Task<GeneralResponse> DeleteById(int id)
         {
-            var item = await appDbContext.Overtimes.FirstOrDefaultAsync(eid => eid.EmployeeId == id);
+            var item = await appDbContext.Overtimes.FindAsync(id);
             if (item is null) return NotFound();
 
             appDbContext.Overtimes.Remove(item);
@@ -22,26 +22,57 @@ namespace ServerLibrary.Repositories.Implementations
             .Overtimes
             .AsNoTracking()
             .Include(t => t.OvertimeType)
+            .Include(e => e.Employee)
             .ToListAsync();
 
-        public async Task<Overtime> GetById(int id) => await appDbContext.Overtimes.FirstOrDefaultAsync(eid => eid.EmployeeId == id);
+        public async Task<Overtime> GetById(int id) => await appDbContext.Overtimes.FindAsync(id);
 
         public async Task<GeneralResponse> Insert(Overtime item)
         {
             appDbContext.Overtimes.Add(item);
+
+            if (item.Status == "Accept" || item.Status == "Reject")
+            {
+                string message = "You have a new overtime request added by your supervisor.";
+                await AddNotification(item.EmployeeId, message);
+            }
+
             await Commit();
             return Success();
         }
         public async Task<GeneralResponse> Update(Overtime item)
         {
-            var obj = await appDbContext.Overtimes.FirstOrDefaultAsync(eid => eid.EmployeeId == item.EmployeeId);
+            var obj = await appDbContext.Overtimes.FindAsync(item.Id);
             if (obj is null) return NotFound();
             obj.StartDate = item.StartDate;
             obj.EndDate = item.EndDate;
+            obj.Status = item.Status;
+            obj.Description = item.Description;
             obj.OvertimeTypeId = item.OvertimeTypeId;
             obj.OvertimeType = item.OvertimeType;
+
+            if (item.Status == "Accept" || item.Status == "Reject")
+            {
+                string message = $"Your overtime request has been {item.Status.ToLower()}.";
+                await AddNotification(item.EmployeeId, message);
+            }
+
             await Commit();
             return Success();
+        }
+
+        public async Task AddNotification(int employeeId, string message)
+        {
+            var notification = new Notification
+            {
+                EmployeeId = employeeId,
+                Message = message,
+                Type = "Overtime",
+                IsRead = false,
+                CreatedAt = DateTime.Now
+            };
+
+            appDbContext.Notifications.Add(notification);
         }
 
         private async Task Commit() => await appDbContext.SaveChangesAsync();

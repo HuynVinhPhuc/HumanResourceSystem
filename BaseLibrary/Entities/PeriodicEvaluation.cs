@@ -6,6 +6,7 @@ namespace BaseLibrary.Entities
 {
     public class PeriodicEvaluation : BaseEntity
     {
+        public int AssessorId { get; set; }
         [Required]
         public DateTime EvaluationDate { get; set; }
 

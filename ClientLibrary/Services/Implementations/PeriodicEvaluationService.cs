@@ -22,6 +22,13 @@ namespace ClientLibrary.Services.Implementations
             return results!;
         }
 
+        public async Task<PeriodicEvaluation> GetClosestByEmployeeId(int employeeid, string baseUrl)
+        {
+            var httpClient = await _getHttpClient.GetPrivateHttpClient();
+            var result = await httpClient.GetFromJsonAsync<PeriodicEvaluation>($"{baseUrl}/closest/{employeeid}");
+            return result!;
+        }
+
         public async Task<GeneralResponse> SendEmail(string message, PeriodicEvaluation item, string baseUrl)
         {
             var httpClient = await _getHttpClient.GetPrivateHttpClient();

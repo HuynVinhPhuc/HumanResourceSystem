@@ -42,6 +42,22 @@ namespace ServerLibrary.Repositories.Implementations
             return instructors;
         }
 
+        public async Task<PeriodicEvaluation> GetClosestByEmployeeId(int employeeid)
+        {
+            var evaluation = await appDbContext.PeriodicEvaluations
+                .AsNoTracking()
+                .Include(e => e.Employee)
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefaultAsync(pe => pe.EmployeeId == employeeid);
+
+            if (evaluation == null)
+            {
+                return new PeriodicEvaluation();
+            }
+
+            return evaluation!;
+        }
+
         public async Task<PeriodicEvaluation> GetById(int id) => await appDbContext.PeriodicEvaluations.FindAsync(id);
 
         public async Task<GeneralResponse> Insert(PeriodicEvaluation item)

@@ -7,6 +7,8 @@ namespace BaseLibrary.DTOs
     {
         [Required]
         public string JobName { get; set; } = string.Empty;
+        [Required]
+        public int Salary { get; set; }
         [Required, Range(1, 99999, ErrorMessage = "You must select branch")]
         public int BranchId { get; set; }
         [Required, Range(1, 99999, ErrorMessage = "You must select town")]

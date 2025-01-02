@@ -2,7 +2,7 @@
 
 @if (allState.ShowDepartment)
 {
-    <div class="continer mt-5">
+    <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
@@ -19,6 +19,8 @@
                                         <th scope="col">Id</th>
                                         <th scope="col">General Department</th>
                                         <th scope="col">Department</th>
+                                        <th scope="col">Manager</th>
+                                        <th scope="col">Telephone</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
@@ -33,6 +35,8 @@
                                                 <td>@item.Id</td>
                                                 <td>@item.GeneralDepartment!.Name</td>
                                                 <td>@item.Name</td>
+                                                <td>@item.ManagerName</td>
+                                                <td>@item.TelephoneNumber</td>
                                                 <td>
                                                     <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="() => EditClicked(item)"></i>&#160;
                                                     <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item)"></i>
@@ -77,9 +81,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        allState.Action += StateHasChanged;
+        allState.DepartmentAction += LoadDefaults;
+    }
+
+    private async void LoadDefaults()
+    {
         await GetDepartments();
         await GetGeneralDepartments();
-        allState.Action += StateHasChanged;
+        StateHasChanged();
     }
 
     private async Task GetDepartments()
@@ -123,6 +133,7 @@
             Department = new();
             await GetGeneralDepartments();
             departmentDialog?.ChangeTitle("Add");
+            departmentDialog?.CloseDialog();
         }
     }
 

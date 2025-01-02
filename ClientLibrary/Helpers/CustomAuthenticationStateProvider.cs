@@ -68,5 +68,13 @@ namespace ClientLibrary.Helpers
 
             return new CustomUserClaims(userId!.Value, name!.Value, email!.Value, role!.Value);
         }
+
+        public async Task<string> GetCurrentUserId()
+        {
+            var stringToken = await localStorageService.GetToken();
+            var deserializeToken = Serializations.DeserializeJsonString<UserSession>(stringToken);
+            var getUserClaims = DecryptToken(deserializeToken.Token!);
+            return getUserClaims.Id;
+        }
     }
 }

@@ -4,33 +4,49 @@
         <Header> Management Menu </Header>
         <Content>
             <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="ViewClicked">
-                <i class="bi bi-eye text-info"></i>
-                <span id="cursorStyle" class="test-info"> View</span>
+                <i class="bi bi-eye text-primary"></i>
+                <span id="cursorStyle" class="text-primary"> View</span>
             </div>
             <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="EditClicked">
-                <i class="bi bi-pencil test-primary"></i>
-                <span id="cursorStyle" class="test-primary"> Edit</span>
+                <i class="bi bi-pencil text-dark"></i>
+                <span id="cursorStyle" class="text-dark"> Edit</span>
             </div>
             <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="DeleteClicked">
                 <i class="bi bi-trash text-danger"></i>
-                <span id="cursorStyle" class="test-danger"> Delete</span>
+                <span id="cursorStyle" class="text-danger"> Delete</span>
+            </div> 
+            <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="ResumeClicked">
+                <i class="bi bi-file-person text-success"></i>
+                <span id="cursorStyle" class="text-success"> Resume</span>
+            </div>
+            @if (!HasAccount)
+            {
+                <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="CreateAccountClicked">
+                    <i class="bi bi-gear text-warning"></i>
+                    <span id="cursorStyle" class="text-warning"> Create Account</span>
+                </div>
+            } 
+            <hr />
+            <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="AddDegreeClicked">
+                <i class="bi bi-file-earmark-plus text-info"></i>
+                <span id="cursorStyle" class="text-info"> Add Degree</span>
+            </div>
+            <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="AddBonusClicked">
+                <i class="bi bi-cash-coin text-warning"></i>
+                <span id="cursorStyle" class="text-warning"> Add Bonus</span>
             </div>
             <hr />
             <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="AddVacationClicked">
                 <i class="bi bi-backpack3 text-success"></i>
-                <span id="cursorStyle" class="test-success"> Add Vacation</span>
+                <span id="cursorStyle" class="text-success"> Add Vacation</span>
             </div>
             <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="AddOvertimeClicked">
                 <i class="bi bi-stopwatch text-danger"></i>
-                <span id="cursorStyle" class="test-danger"> Add Overtime</span>
-            </div>
-            <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="AddHealthClicked">
-                <i class="bi bi-hospital text-warning"></i>
-                <span id="cursorStyle" class="test-warning"> Add Health</span>
+                <span id="cursorStyle" class="text-danger"> Add Overtime</span>
             </div>
             <div class="hstack gap-2 mb-2" id="cursorStyle" @onclick="AddSanctionClicked">
                 <i class="bi bi-x-octagon text-info"></i>
-                <span id="cursorStyle" class="test-info"> Add Sanction</span>
+                <span id="cursorStyle" class="text-info"> Add Sanction</span>
             </div>
         </Content>
     </DialogTemplates>
@@ -45,6 +61,8 @@
 @code {
     SfDialog? OpenDialog;
     private bool IsVisible { get; set; } = false;
+    [Parameter]
+    public bool HasAccount { get; set; }
 
     [Parameter] public EventCallback HandleViewClicked { get; set; }
     private async Task ViewClicked() => await HandleViewClicked.InvokeAsync();
@@ -66,6 +84,18 @@
 
     [Parameter] public EventCallback HandleAddSanctionClicked { get; set; }
     private async Task AddSanctionClicked() => await HandleAddSanctionClicked.InvokeAsync();
+
+    [Parameter] public EventCallback HandleCreateAccountClicked { get; set; }
+    private async Task CreateAccountClicked() => await HandleCreateAccountClicked.InvokeAsync();
+
+    [Parameter] public EventCallback HandleAddDegreeClicked { get; set; }
+    private async Task AddDegreeClicked() => await HandleAddDegreeClicked.InvokeAsync();
+
+    [Parameter] public EventCallback HandleAddBonusClicked { get; set; }
+    private async Task AddBonusClicked() => await HandleAddBonusClicked.InvokeAsync();
+
+    [Parameter] public EventCallback HandleResumeClicked { get; set; }
+    private async Task ResumeClicked() => await HandleResumeClicked.InvokeAsync();
 
     public void OpenContextMenu()
     {

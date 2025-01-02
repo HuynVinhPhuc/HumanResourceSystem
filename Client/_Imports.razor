@@ -25,6 +25,8 @@
 @using Client.Pages.ContentPages.EvaluationPages
 @using Client.Pages.ContentPages.TrainingPages
 @using Client.Pages.ContentPages.RecruitmentPages
+@using Client.Pages.AccountPages
+@using Client.Pages.OrderPages.BonusPages
 @using Client.Pages.OrderPages.OvertimePages
 @using Client.Pages.OrderPages.VacationPages
 @using Client.Pages.OrderPages.DoctorPages
@@ -33,7 +35,13 @@
 @using Client.Pages.ContentPages.UserPages
 @using Client.Pages.ContentPages.LocationPages
 @using Client.Pages.ContentPages.DepartmentPages
+@using Client.Pages.ContentPages.IndividualPages
+@using Client.Pages.ContentPages.EmployeeTransferPages
+@using Client.Pages.ContentPages.Another
 @using Client.Pages.OrderPages
+
+@using Append.Blazor.Printing
+@inject IPrintingService PrintingService
 
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavManager
@@ -50,7 +58,7 @@
 @* // General Departments / Department / Branch *@
 @inject IGenericServiceInterface<GeneralDepartment> generalDepartmentService
 @inject IGenericServiceInterface<Department> departmentService
-@inject IGenericServiceInterface<Branch> branchService
+@inject IBranchService branchService
 
 @* // Country / City / Town *@
 @inject IGenericServiceInterface<Country> countryService
@@ -73,14 +81,23 @@
 @inject IGenericServiceInterface<Recruitment> recruitmentService
 @inject ICandidateService candidateService
 
-@* // TrainingProgram / Instructor / Participant *@
+@* // TrainingProgram / Instructor / Degree *@
 @inject IGenericServiceInterface<TrainingProgram> trainingProgramService
 @inject IGenericServiceInterface<Instructor> instructorService
-@inject IParticipantService participantService
+@inject IDegreeService degreeService
 
 @* //PeriodicEvaluation *@
 @inject IPeriodicEvaluationService periodicEvaluationService
 
+@* //Bonus *@
+@inject IBonusService bonusService
+
+@* //EmployeeTransfer *@
+@inject IEmployeeTransferService employeeTransferService
+
 @* // Employee *@
 @inject IGenericServiceInterface<Employee> employeeService
+
+@* // Notification *@
+@inject INotificationService notificationService
 
